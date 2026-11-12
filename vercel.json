@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    { "source": "/", "destination": "/portfolio.html", "permanent": false }
+  ],
+  "headers": [
+    { "source": "/vendor/(.*)", "headers": [ { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" } ] },
+    { "source": "/photo/(.*)",  "headers": [ { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" } ] }
+  ]
+}
