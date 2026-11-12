@@ -1749,11 +1749,10 @@ function animate3D(){
       photoWrap.style.transform=`translateY(${(1-p)*90}px)`;
     }
   }
-  if(particleName){
+  if(particleName&&particleName.visible){
     particleName.rotation.y=t*0.15;
     const arr=particleName.geometry.attributes.position.array, base=particleName.userData.base;
-    for(let i=0;i<arr.length;i+=3){arr[i+2]=base[i+2]+Math.sin(t*1.5+i)*0.05;}
-    particleName.geometry.attributes.position.needsUpdate=true;
+    if((window._pf=(window._pf||0)+1)%2===0){for(let i=0;i<arr.length;i+=3){arr[i+2]=base[i+2]+Math.sin(t*1.5+i)*0.05;}particleName.geometry.attributes.position.needsUpdate=true;}
   }
   if(aboutPoints){aboutPoints.rotation.y=t*0.12;aboutPoints.rotation.x=t*0.05;}
   if(journeyGroup){journeyGroup.rotation.y=Math.sin(t*0.15)*0.2;journeyGroup.position.z=-180+Math.sin(t*0.2)*0.3;}
@@ -1779,7 +1778,7 @@ function animate3D(){
     g.visible=vis;
   });
 
-  /*FAST-CULL*/if(typeof worldGroups!=="undefined"&&worldGroups){for(const g of worldGroups){if(g)g.visible=Math.abs(camera.position.z-g.position.z)<160;}}renderer.render(scene,camera);
+  renderer.render(scene,camera);
 }
 
 /* ===================== PRIVATE GALLERY (Web Crypto) ===================== */
