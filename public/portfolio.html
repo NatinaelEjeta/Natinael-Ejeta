@@ -626,7 +626,7 @@ footer{position:relative;margin-top:auto;z-index:3;padding:50px 20px 30px;border
         <div class="field"><label for="cf-name">Name</label><input id="cf-name" name="name" type="text" placeholder="Your name" /><div class="err" data-err="name"></div></div>
         <div class="field"><label for="cf-email">Email</label><input id="cf-email" name="email" type="email" placeholder="you@email.com" /><div class="err" data-err="email"></div></div>
         <div class="field"><label for="cf-msg">Message</label><textarea id="cf-msg" name="message" rows="4" placeholder="Tell me about your project..."></textarea><div class="err" data-err="message"></div></div>
-        <button class="btn btn-gold" type="submit">Send Message</button>
+        <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true"><button class="btn btn-gold" type="submit">Send Message</button>
         <div class="form-success" id="formSuccess"></div>
       </form>
     </div>
@@ -1396,11 +1396,25 @@ function initContactForm(){
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setErr('email','Please enter a valid email.');ok=false;}
     if(msg.length<10){setErr('message','Message should be at least 10 characters.');ok=false;}
     if(!ok) return;
-    $('#formSuccess').textContent='Thank you! Opening your email client…';
-    // open mailto with prefilled body
-    const body=encodeURIComponent(`${msg}\n\n— ${name} (${email})`);
-    window.location.href=`mailto:${CONFIG.email}?subject=${encodeURIComponent('Portfolio enquiry from '+name)}&body=${body}`;
-    setTimeout(()=>{$('#formSuccess').textContent='Message ready in your email app. I will reply soon.';},1500);
+    const btn=form.querySelector('button[type="submit"]'), out=$('#formSuccess');
+    if(btn.disabled) return;
+    const label=btn.textContent; btn.disabled=true; btn.textContent='Sending...'; out.textContent='';
+    const bot=form.querySelector('[name="botcheck"]');
+    fetch('https://api.web3forms.com/submit',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({
+        access_key:'d5f41aea-eb1a-4483-8974-8007d2204348',
+        subject:'Portfolio enquiry from '+name,
+        from_name:'Portfolio website',
+        name:name, email:email, message:msg,
+        botcheck: bot ? bot.checked : false
+      })
+    }).then(r=>r.json()).then(d=>{
+      if(d&&d.success){ out.textContent='Thank you! Your message was sent. I will reply soon.'; form.reset(); }
+      else { out.textContent='Could not send right now. Please email me directly.'; }
+    }).catch(()=>{ out.textContent='Network error. Please email me directly.'; })
+    .finally(()=>{ btn.disabled=false; btn.textContent=label; });
   });
 }
 
