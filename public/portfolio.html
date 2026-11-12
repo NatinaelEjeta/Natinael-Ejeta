@@ -1779,7 +1779,7 @@ function animate3D(){
     g.visible=vis;
   });
 
-  renderer.render(scene,camera);
+  /*FAST-CULL*/if(typeof worldGroups!=="undefined"&&worldGroups){for(const g of worldGroups){if(g)g.visible=Math.abs(camera.position.z-g.position.z)<160;}}renderer.render(scene,camera);
 }
 
 /* ===================== PRIVATE GALLERY (Web Crypto) ===================== */
